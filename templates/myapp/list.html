@@ -1,0 +1,130 @@
+{% extends 'myapp/base.html' %} {% block content %}
+<div class="container mt-4">
+  <h1 class="mb-4">Item List</h1>
+  <a href="{% url 'item_create' %}" class="btn btn-primary mb-3"
+    >Create New Item</a
+  >
+  <table class="table table-bordered table-striped">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Description</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for item in items %}
+      <tr>
+        <td>{{ item.name }}</td>
+        <td>{{ item.description }}</td>
+        <td>
+          <a
+            href="{% url 'item_update' item.pk %}"
+            class="btn btn-warning btn-sm"
+            >Edit</a
+          >
+          <button
+            type="button"
+            class="btn btn-danger btn-sm"
+            data-bs-toggle="modal"
+            data-bs-target="#deleteModal{{ item.pk }}"
+          >
+            Delete
+          </button>
+        </td>
+      </tr>
+
+      <div
+        class="modal fade"
+        id="deleteModal{{ item.pk }}"
+        tabindex="-1"
+        aria-labelledby="deleteModalLabel{{ item.pk }}"
+        aria-hidden="true"
+      >
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="deleteModalLabel{{ item.pk }}">
+                Confirm Delete
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              Are you sure you want to delete
+              <strong>"{{ item.name }}"</strong>? This action cannot be undone.
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Cancel
+              </button>
+              <form
+                method="post"
+                action="{% url 'item_delete' item.pk %}"
+                style="display: inline"
+              >
+                {% csrf_token %}
+                <button type="submit" class="btn btn-danger">
+                  Yes, delete
+                </button>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% if messages %}
+<div
+  class="modal fade"
+  id="successModal"
+  tabindex="-1"
+  aria-labelledby="successModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title" id="successModalLabel">Success</h5>
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        {% for message in messages %}
+        <p>{{ message }}</p>
+        {% endfor %}
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script>
+  $(document).ready(function () {
+    {% if messages %}
+    $('#successModal').modal('show');
+    {% endif %}
+  });
+</script>
+{% endblock %}
